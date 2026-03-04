@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GridWorld – 強化學習網格地圖</title>
+  <meta name="description" content="互動式 Grid World 網格地圖，支援起點、終點、障礙物設定，以及隨機策略與價值評估顯示。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- ─── Header ─────────────────────────────────────── -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="logo">
+          <span class="logo-icon">⊞</span>
+          <span class="logo-text">Grid<span class="accent">World</span></span>
+        </div>
+        <p class="subtitle">強化學習策略評估視覺化</p>
+      </div>
+    </header>
+
+    <!-- ─── Main layout ───────────────────────────────── -->
+    <main class="main-layout">
+
+      <!-- Control Panel -->
+      <aside class="control-panel">
+        <section class="panel-section">
+          <h2 class="section-title">⚙ 網格設定</h2>
+          <label class="field-label" for="grid-size">網格大小 n</label>
+          <select id="grid-size" class="select-input">
+            <option value="5">5 × 5</option>
+            <option value="6">6 × 6</option>
+            <option value="7" selected>7 × 7</option>
+            <option value="8">8 × 8</option>
+            <option value="9">9 × 9</option>
+          </select>
+          <button id="btn-build" class="btn btn-primary">建立網格</button>
+          <button id="btn-reset" class="btn btn-ghost">重置</button>
+        </section>
+
+        <section class="panel-section">
+          <h2 class="section-title">🗺 圖例</h2>
+          <div class="legend">
+            <span class="legend-dot start"></span><span>起點 (S)</span>
+          </div>
+          <div class="legend">
+            <span class="legend-dot goal"></span><span>終點 (G)</span>
+          </div>
+          <div class="legend">
+            <span class="legend-dot obstacle"></span><span>障礙物</span>
+          </div>
+          <div class="legend">
+            <span class="legend-dot empty"></span><span>空格</span>
+          </div>
+        </section>
+
+        <section class="panel-section" id="hw2-panel" style="display:none">
+          <h2 class="section-title">🤖 HW1-2 策略</h2>
+          <button id="btn-generate" class="btn btn-accent">生成隨機策略 + V(s)</button>
+          <div class="toggle-row">
+            <label class="toggle-label" for="toggle-values">顯示 V(s) 數值</label>
+            <label class="switch">
+              <input type="checkbox" id="toggle-values" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label class="toggle-label" for="toggle-arrows">顯示策略箭頭</label>
+            <label class="switch">
+              <input type="checkbox" id="toggle-arrows" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Info counters -->
+        <section class="panel-section" id="info-panel" style="display:none">
+          <h2 class="section-title">📊 狀態</h2>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-num" id="info-n">-</span>
+              <span class="info-lbl">網格大小</span>
+            </div>
+            <div class="info-item">
+              <span class="info-num" id="info-obs">0</span>
+              <span class="info-lbl">障礙物</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <!-- Grid Area -->
+      <div class="grid-area">
+        <div id="grid-container" class="grid-placeholder">
+          <div class="placeholder-text">
+            <span class="ph-icon">⊞</span>
+            <p>請選擇網格大小，然後點擊「建立網格」</p>
+          </div>
+        </div>
+
+        <!-- Status bar -->
+        <div id="status-bar" class="status-bar" style="display:none">
+          <span id="status-icon">🟢</span>
+          <span id="status-text">請點擊一個格子設定起點</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/static/main.js"></script>
+</body>
+</html>
