@@ -3,6 +3,9 @@
 A Flask-based interactive **Grid World** web application that demonstrates **Policy Evaluation** and **Value Iteration** in reinforcement learning.  
 Built for Deep Reinforcement Learning HW1, 2026.
 
+🌐 **Live Demo**: [https://dayi1225-drl-hw1-gridworld.zeabur.app/](https://dayi1225-drl-hw1-gridworld.zeabur.app/)  
+🐳 **Docker Hub**: [`dayi1225/gridworld-drl`](https://hub.docker.com/r/dayi1225/gridworld-drl)
+
 ---
 
 ## ✨ Features
