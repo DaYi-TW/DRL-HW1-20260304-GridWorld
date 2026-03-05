@@ -251,3 +251,19 @@ d5545ab  docs: add README.md
 | `style.css` | 新增 `.on-path` 青色 glow（`rgba(6,182,212)`）+ `pathPulse` 動畫 | ✅ |
 | `style.css` | 修正：`.on-path:not(.start):not(.goal)` 保留 S 綠色、G 紅色 | ✅ |
 | 瀏覽器驗證 | S 保持綠色、G 保持紅色、路徑青色 glow、逐格動畫 | ✅ |
+
+---
+
+### 💬 對話 5 — Docker 打包推送
+**使用者**: `請包裝成docker image，然後要放到zeabur上的，docker 帳戶 dayi1225`
+
+#### ⚙️ 執行動作
+
+| 步驟 | 指令/動作 | 結果 |
+|------|-----------|------|
+| 建立 `Dockerfile` | `python:3.12-slim`，Flask run on `0.0.0.0:5000` | ✅ |
+| 建立 `.dockerignore` | 排除 `__pycache__/`、`.git`、`*.md` 等 | ✅ |
+| Docker Build | `docker build -t dayi1225/gridworld-drl:latest -t dayi1225/gridworld-drl:1.0 .` | ✅ 12s |
+| Docker Push | `docker push dayi1225/gridworld-drl:latest` | ✅ |
+| Docker Push | `docker push dayi1225/gridworld-drl:1.0` | ✅ |
+| Git commit + push | 提交 Dockerfile + .dockerignore | ✅ |
