@@ -8,7 +8,7 @@
 let n = 7;
 let phase = "EMPTY";   // EMPTY | SET_START | SET_GOAL | SET_OBSTACLES | DONE
 let startCell = null;  // [r, c]
-let goalCell  = null;  // [r, c]
+let goalCell = null;  // [r, c]
 let obstacles = [];    // [[r,c], ...]
 let maxObstacles = 0;
 
@@ -17,17 +17,19 @@ let values = {};   // { "r,c": float }
 
 // ─── DOM refs ──────────────────────────────────────────────────────────────
 const gridContainer = document.getElementById("grid-container");
-const statusBar     = document.getElementById("status-bar");
-const statusIcon    = document.getElementById("status-icon");
-const statusText    = document.getElementById("status-text");
-const hw2Panel      = document.getElementById("hw2-panel");
-const infoPanel     = document.getElementById("info-panel");
-const infoN         = document.getElementById("info-n");
-const infoObs       = document.getElementById("info-obs");
+const statusBar = document.getElementById("status-bar");
+const statusIcon = document.getElementById("status-icon");
+const statusText = document.getElementById("status-text");
+const hw2Panel = document.getElementById("hw2-panel");
+const hw3Panel = document.getElementById("hw3-panel");
+const infoPanel = document.getElementById("info-panel");
+const infoN = document.getElementById("info-n");
+const infoObs = document.getElementById("info-obs");
 
-const btnBuild    = document.getElementById("btn-build");
-const btnReset    = document.getElementById("btn-reset");
+const btnBuild = document.getElementById("btn-build");
+const btnReset = document.getElementById("btn-reset");
 const btnGenerate = document.getElementById("btn-generate");
+const btnOptimal = document.getElementById("btn-optimal");
 const toggleValues = document.getElementById("toggle-values");
 const toggleArrows = document.getElementById("toggle-arrows");
 
@@ -39,11 +41,12 @@ function buildGrid() {
   // Reset state
   phase = "SET_START";
   startCell = null;
-  goalCell  = null;
+  goalCell = null;
   obstacles = [];
   policy = {};
   values = {};
   hw2Panel.style.display = "none";
+  hw3Panel.style.display = "none";
   infoPanel.style.display = "block";
   infoN.textContent = `${n}×${n}`;
   infoObs.textContent = `0 / ${maxObstacles}`;
@@ -81,9 +84,9 @@ function buildGrid() {
 
 // ─── Cell click handler ────────────────────────────────────────────────────
 function onCellClick(e) {
-  const td  = e.currentTarget;
-  const r   = parseInt(td.dataset.row, 10);
-  const c   = parseInt(td.dataset.col, 10);
+  const td = e.currentTarget;
+  const r = parseInt(td.dataset.row, 10);
+  const c = parseInt(td.dataset.col, 10);
   const key = `${r},${c}`;
 
   if (phase === "EMPTY" || phase === "DONE") return;
@@ -91,7 +94,7 @@ function onCellClick(e) {
   // Prevent clicking already occupied cells (except DONE reset)
   if (td.classList.contains("obstacle")) return;
   if (phase !== "SET_START" && td.classList.contains("start")) return;
-  if (phase !== "SET_GOAL"  && td.classList.contains("goal"))  return;
+  if (phase !== "SET_GOAL" && td.classList.contains("goal")) return;
 
   if (phase === "SET_START") {
     startCell = [r, c];
@@ -114,6 +117,9 @@ function onCellClick(e) {
       hw2Panel.style.display = "flex";
       hw2Panel.style.flexDirection = "column";
       hw2Panel.style.gap = ".7rem";
+      hw3Panel.style.display = "flex";
+      hw3Panel.style.flexDirection = "column";
+      hw3Panel.style.gap = ".7rem";
     }
   }
 
@@ -131,10 +137,10 @@ function setCellState(td, cls, label) {
 function updateStatus() {
   const remaining = maxObstacles - obstacles.length;
   const map = {
-    SET_START:     ["🟢", `請點擊一個格子設定起點 S`],
-    SET_GOAL:      ["🔴", `請點擊一個格子設定終點 G`],
+    SET_START: ["🟢", `請點擊一個格子設定起點 S`],
+    SET_GOAL: ["🔴", `請點擊一個格子設定終點 G`],
     SET_OBSTACLES: ["⬜", `請設定障礙物（剩餘 ${remaining} 個）`],
-    DONE:          ["✅", `設定完成！可點擊「生成隨機策略 + V(s)」`],
+    DONE: ["✅", `設定完成！可點擊「生成隨機策略 + V(s)」`],
   };
   const [icon, text] = map[phase] || ["ℹ️", ""];
   statusIcon.textContent = icon;
@@ -151,12 +157,12 @@ async function generatePolicy() {
   const body = {
     n,
     start: startCell,
-    goal:  goalCell,
+    goal: goalCell,
     obstacles,
   };
 
   try {
-    const res  = await fetch("/api/generate", {
+    const res = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -175,13 +181,13 @@ async function generatePolicy() {
 
 // ─── Render arrows and V(s) ────────────────────────────────────────────────
 function renderPolicyAndValues() {
-  const showVals   = toggleValues.checked;
+  const showVals = toggleValues.checked;
   const showArrows = toggleArrows.checked;
 
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
       const key = `${r},${c}`;
-      const td  = document.getElementById(`cell-${r}-${c}`);
+      const td = document.getElementById(`cell-${r}-${c}`);
       if (!td) continue;
 
       const arrowEl = td.querySelector(".cell-arrow");
@@ -210,7 +216,7 @@ function renderPolicyAndValues() {
 
 // ─── Toggle handlers ───────────────────────────────────────────────────────
 function applyToggles() {
-  const showVals   = toggleValues.checked;
+  const showVals = toggleValues.checked;
   const showArrows = toggleArrows.checked;
 
   document.querySelectorAll(".cell-value").forEach(el => {
@@ -225,10 +231,17 @@ function applyToggles() {
 function fullReset() {
   phase = "EMPTY";
   startCell = null;
-  goalCell  = null;
+  goalCell = null;
   obstacles = [];
   policy = {};
   values = {};
+
+  // Remove optimal glow and path highlights from all cells
+  document.querySelectorAll(".grid-cell.optimal").forEach(td => td.classList.remove("optimal"));
+  document.querySelectorAll(".grid-cell.on-path").forEach(td => {
+    td.classList.remove("on-path");
+    td.style.removeProperty("--path-delay");
+  });
 
   gridContainer.innerHTML = `
     <div class="placeholder-text">
@@ -239,15 +252,80 @@ function fullReset() {
   gridContainer.style.cssText = "";
 
   statusBar.style.display = "none";
-  hw2Panel.style.display  = "none";
+  hw2Panel.style.display = "none";
+  hw3Panel.style.display = "none";
   infoPanel.style.display = "none";
 
-  fetch("/api/reset", { method: "POST" }).catch(() => {});
+  fetch("/api/reset", { method: "POST" }).catch(() => { });
+}
+
+// ─── Generate optimal policy (Value Iteration) ────────────────────────────
+async function generateOptimalPolicy() {
+  if (!startCell || !goalCell) return;
+
+  btnOptimal.disabled = true;
+  btnOptimal.textContent = "計算中…";
+
+  const body = {
+    n,
+    start: startCell,
+    goal: goalCell,
+    obstacles,
+  };
+
+  try {
+    const res = await fetch("/api/optimal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    policy = data.policy;
+    values = data.values;
+
+    // Clear previous path & optimal markers
+    document.querySelectorAll(".grid-cell.optimal").forEach(td => td.classList.remove("optimal"));
+    document.querySelectorAll(".grid-cell.on-path").forEach(td => {
+      td.classList.remove("on-path");
+      td.style.removeProperty("--path-delay");
+    });
+
+    // Add golden glow to cells that have optimal actions
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < n; c++) {
+        const td = document.getElementById(`cell-${r}-${c}`);
+        if (!td) continue;
+        const key = `${r},${c}`;
+        if (policy[key]) {
+          td.classList.add("optimal");
+        }
+      }
+    }
+
+    // Draw optimal path from S to G
+    if (data.path && data.path.length > 0) {
+      data.path.forEach(([r, c], idx) => {
+        const td = document.getElementById(`cell-${r}-${c}`);
+        if (td) {
+          td.style.setProperty("--path-delay", `${idx * 0.08}s`);
+          td.classList.add("on-path");
+        }
+      });
+    }
+
+    renderPolicyAndValues();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    btnOptimal.disabled = false;
+    btnOptimal.textContent = "重新推導最佳策略";
+  }
 }
 
 // ─── Event listeners ───────────────────────────────────────────────────────
 btnBuild.addEventListener("click", buildGrid);
 btnReset.addEventListener("click", fullReset);
 btnGenerate.addEventListener("click", generatePolicy);
+btnOptimal.addEventListener("click", generateOptimalPolicy);
 toggleValues.addEventListener("change", applyToggles);
 toggleArrows.addEventListener("change", applyToggles);

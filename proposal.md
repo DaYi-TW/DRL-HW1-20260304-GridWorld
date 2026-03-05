@@ -109,6 +109,40 @@ GridWorld/
 
 ---
 
+## HW1-3：最佳策略推導（Value Iteration）
+
+### 功能說明
+
+1. **價值迭代演算法**：使用 Bellman Optimality Equation 迭代計算每格的最佳價值 V*(s)。
+2. **最佳策略推導**：收斂後，以 argmax 反推每格的最佳動作 π*(s)。
+3. **最佳策略顯示**：箭頭取代隨機策略，並以金色光暈標記最佳策略格子。
+4. **更新價值函數**：V(s) 更新為最佳策略下的期望回報。
+
+### 價值迭代演算法
+
+採用 **Value Iteration（Bellman Optimality Equation）**：
+
+```
+初始化：V(s) = 0 for all s
+重複直到收斂（Δ < θ = 1e-6）：
+  對每個非障礙物、非終點狀態 s：
+    V(s) ← max_a [ R(s, a) + γ · V(next_state(s, a)) ]
+  （R = -1 for non-terminal, γ = 0.9）
+
+收斂後提取最佳策略：
+  π*(s) = argmax_a [ R(s, a) + γ · V(next_state(s, a)) ]
+```
+
+### API 端點
+
+| Method | Endpoint | 說明 |
+|--------|----------|------|
+| `POST` | `/api/optimal` | 送出網格設定，回傳最佳策略 + V*(s) |
+
+回傳格式與 `/api/generate` 相同。
+
+---
+
 ## 開發計畫 Development Plan
 
 | 階段 | 工作項目 | 預計產出 |
@@ -117,7 +151,8 @@ GridWorld/
 | Phase 2 | 前端點擊事件與狀態機 | 起點/終點/障礙物互動完成 |
 | Phase 3 | 後端策略生成 API | 隨機策略箭頭顯示 |
 | Phase 4 | 策略評估演算法實作 | V(s) 正確計算並顯示 |
-| Phase 5 | UI 美化與測試 | 完整可操作成品 |
+| Phase 5 | 價值迭代 + 最佳策略推導 | 最佳策略箭頭 + V*(s) 顯示 |
+| Phase 6 | UI 美化與測試 | 完整可操作成品 |
 
 ---
 
@@ -132,3 +167,4 @@ GridWorld/
 | 隨機行動顯示 (20%) | 箭頭顯示於各非牆格，含終點排除邏輯 |
 | 策略評估正確性 (15%) | 收斂迭代、Bellman 方程正確實作 |
 | 程式碼結構（HW1-2）(5%) | 後端演算法獨立於 Flask 路由 |
+| 最佳策略推導（HW1-3）| Value Iteration 收斂、argmax 提取最佳動作 |

@@ -139,3 +139,115 @@ d5545ab  docs: add README.md
 | 分支 | 狀態 |
 |------|------|
 | `main` | ✅ 最新（包含 README + log）|
+
+---
+
+## 🗓️ Session 3 — 2026-03-05（上午）
+**對話 ID**: `4d10dfbb-dfef-4848-b341-4edbb529f3cf`  
+**主題**: 撰寫 skill.md（Agent Skill）+ 更新 log.md 對話紀錄
+
+---
+
+### 💬 對話 1 — 初次請求
+**使用者**: `請將我的需求寫成skill.md，請將對話紀錄，以及執行步驟、過程，記錄下來到log.md`
+
+#### ⚙️ 執行動作
+
+| 步驟 | 動作 | 結果 |
+|------|------|------|
+| 列出專案目錄 | `list_dir` + `find_by_name` 掃描專案結構 | ✅ 確認 11 個檔案 |
+| 讀取所有專案檔案 | `README.md`、`proposal.md`、`log.md`、`app.py`、`grid.py`、`main.js`、`index.html`、`style.css` | ✅ 全部讀取 |
+| 建立 `skill.md`（v1） | 撰寫為「專案需求文件」格式 | ✅ 但方向錯誤 |
+| 更新 `log.md` | 新增 Session 3 紀錄 | ✅ |
+
+---
+
+### 💬 對話 2 — 使用者澄清 skill.md 用途
+**使用者**: `skill.md是Agent Skills是你幫AI預設好的一套「遇到這類任務，你該這樣做」的指令包。不用每次重新說明背景、格式、注意事項，AI看到任務就知道怎麼跑。`
+
+#### ⚙️ 執行動作
+
+| 步驟 | 動作 | 結果 |
+|------|------|------|
+| 重寫 `skill.md`（v2） | 改為 **Agent Skill 格式**：觸發條件、固定技術棧、8 步執行指引、注意事項、品質提醒 | ✅ |
+| 更新 `log.md` | 補充對話 2 的紀錄 | ✅ |
+
+**skill.md v2 結構**：
+- YAML Frontmatter（name + description）
+- 觸發條件（何時啟用本技能）
+- 固定技術棧表
+- 8 步執行步驟（專案骨架 → app.py → grid.py → 前端 → JS → CSS → 測試 → Git）
+- 7 條注意事項（演算法分離、不重整、越界處理等）
+- 評分重點提醒
+
+---
+
+### 📂 本次產出檔案
+
+| 檔案 | 說明 |
+|------|------|
+| `skill.md` | 🤖 Agent Skill 指令包（AI 操作手冊） |
+| `log.md` | 📋 更新對話紀錄（新增 Session 3，含 2 輪對話）|
+
+---
+
+### 💬 對話 3 — 新增 HW1-3 Value Iteration
+**使用者**: `增加 HW1-3: 使用價值迭代算法推導最佳政策`（含詳細功能規格）  
+**使用者補充**: `proposal.md要更新`
+
+#### ⚙️ 執行動作
+
+| 步驟 | 動作 | 結果 |
+|------|------|------|
+| 規劃實作方案 | 建立 `implementation_plan.md` | ✅ |
+| `grid.py` | 新增 `value_iteration()` — Bellman Optimality Equation 迭代 + argmax 提取最佳策略 | ✅ |
+| `app.py` | 新增 `POST /api/optimal` 端點 | ✅ |
+| `index.html` | 新增 HW1-3 面板（⭐ 金色按鈕 + 說明文字） | ✅ |
+| `main.js` | 新增 `generateOptimalPolicy()`，呼叫 `/api/optimal`，加金色 glow | ✅ |
+| `main.js` | 修正 `fullReset()` 清除 optimal glow + 隱藏 hw3Panel | ✅ |
+| `style.css` | 新增 `.btn-optimal` 金色漸層 + `.grid-cell.optimal` glow + `.hint-text` | ✅ |
+| `proposal.md` | 新增 HW1-3 章節（價值迭代演算法 + API + 開發計畫 + 評分） | ✅ |
+| `skill.md` | 全面更新（觸發條件、路由、函式、UI、驗證、評分） | ✅ |
+| `log.md` | 新增對話 3 紀錄 | ✅ |
+
+---
+
+### 📂 Session 3 完整產出
+
+| 檔案 | 說明 |
+|------|------|
+| `skill.md` | 🤖 Agent Skill 指令包（含 HW1-3） |
+| `log.md` | 📋 對話紀錄（Session 3，含 3 輪對話） |
+| `grid.py` | 🧠 新增 `value_iteration()` 函式 |
+| `app.py` | 🌐 新增 `/api/optimal` API |
+| `index.html` | 🖥️ 新增 HW1-3 最佳策略面板 |
+| `main.js` | ⚡ 新增 `generateOptimalPolicy()` + 修正 reset |
+| `style.css` | 🎨 新增金色按鈕 + optimal glow 樣式 |
+| `proposal.md` | 📄 新增 HW1-3 章節 |
+| `README.md` | 📖 更新（HW1-3 功能、演算法、API、評分） |
+
+### ✅ 瀏覽器驗證結果
+
+- 7×7 網格正確渲染，S/G/X 設定正常
+- HW1-2 隨機策略箭頭 + V(s) 正常顯示
+- HW1-3 最佳策略箭頭 + 金色 glow 正常顯示
+- V(s) 從隨機策略的 -10.00 改善為最佳策略的 -7.18（起點）
+- Toggle 開關正常運作
+
+---
+
+### 💬 對話 4 — 畫出最佳路線 + 修正起終點顏色
+**使用者**: `HW1-3 最佳策略 要畫出最佳的路線`  
+**使用者補充**: `起點跟終點的顏色也還要在`
+
+#### ⚙️ 執行動作
+
+| 步驟 | 動作 | 結果 |
+|------|------|------|
+| `grid.py` | 新增 `trace_optimal_path()` — 從 S 追蹤最佳策略至 G，回傳路徑座標 | ✅ |
+| `app.py` | `/api/optimal` 回應加入 `path` 欄位 | ✅ |
+| `main.js` | `generateOptimalPolicy()` 渲染 `.on-path` 青色路徑 + 逐格動畫 | ✅ |
+| `main.js` | `fullReset()` 清除 `.on-path` 類別 | ✅ |
+| `style.css` | 新增 `.on-path` 青色 glow（`rgba(6,182,212)`）+ `pathPulse` 動畫 | ✅ |
+| `style.css` | 修正：`.on-path:not(.start):not(.goal)` 保留 S 綠色、G 紅色 | ✅ |
+| 瀏覽器驗證 | S 保持綠色、G 保持紅色、路徑青色 glow、逐格動畫 | ✅ |

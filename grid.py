@@ -82,3 +82,110 @@ def policy_evaluation(n, start, goal, obstacles, policy, gamma=0.9, theta=1e-6):
 
     # Round for display
     return {k: round(v, 2) for k, v in V.items()}
+
+
+def value_iteration(n, start, goal, obstacles, gamma=0.9, theta=1e-6):
+    """
+    Value Iteration using the Bellman Optimality Equation.
+
+    V(s) = max_a [ R(s, a) + γ · V(s') ]
+
+    After convergence, extracts optimal policy:
+    π*(s) = argmax_a [ R(s, a) + γ · V(s') ]
+
+    Returns (policy_dict, values_dict).
+    """
+    obstacle_set = set(obstacles)
+    goal_key = f"{goal[0]},{goal[1]}"
+
+    # Initialise V(s) = 0 for all states
+    V = {}
+    for r in range(n):
+        for c in range(n):
+            V[f"{r},{c}"] = 0.0
+
+    def is_obstacle(r, c):
+        return f"{r},{c}" in obstacle_set
+
+    def next_state(r, c, action):
+        dr, dc = ACTION_DELTA[action]
+        nr, nc = r + dr, c + dc
+        if nr < 0 or nr >= n or nc < 0 or nc >= n or is_obstacle(nr, nc):
+            return r, c
+        return nr, nc
+
+    # ── Value Iteration ─────────────────────────────────────────────
+    while True:
+        delta = 0.0
+        for r in range(n):
+            for c in range(n):
+                key = f"{r},{c}"
+                # Skip terminal and obstacle states
+                if key == goal_key or key in obstacle_set:
+                    continue
+                # Compute max over all actions
+                best_v = float("-inf")
+                for action in ACTIONS:
+                    nr, nc = next_state(r, c, action)
+                    next_key = f"{nr},{nc}"
+                    q = -1.0 + gamma * V[next_key]
+                    if q > best_v:
+                        best_v = q
+                new_v = best_v
+                delta = max(delta, abs(new_v - V[key]))
+                V[key] = new_v
+        if delta < theta:
+            break
+
+    # ── Extract optimal policy ──────────────────────────────────────
+    policy = {}
+    for r in range(n):
+        for c in range(n):
+            key = f"{r},{c}"
+            if key == goal_key or key in obstacle_set:
+                continue
+            best_action = ACTIONS[0]
+            best_v = float("-inf")
+            for action in ACTIONS:
+                nr, nc = next_state(r, c, action)
+                next_key = f"{nr},{nc}"
+                q = -1.0 + gamma * V[next_key]
+                if q > best_v:
+                    best_v = q
+                    best_action = action
+            policy[key] = best_action
+
+    rounded_values = {k: round(v, 2) for k, v in V.items()}
+    return policy, rounded_values
+
+
+def trace_optimal_path(n, start, goal, obstacles, policy):
+    """
+    Follow the optimal policy from start to goal.
+    Returns a list of [row, col] pairs representing the path.
+    Stops if goal is reached or if stuck in a loop (max n*n steps).
+    """
+    obstacle_set = set(obstacles)
+    goal_key = f"{goal[0]},{goal[1]}"
+    path = [list(start)]
+    r, c = start[0], start[1]
+    max_steps = n * n
+
+    for _ in range(max_steps):
+        key = f"{r},{c}"
+        if key == goal_key:
+            break
+        if key not in policy:
+            break
+        action = policy[key]
+        dr, dc = ACTION_DELTA[action]
+        nr, nc = r + dr, c + dc
+        # Out of bounds or obstacle → stay (stuck)
+        if nr < 0 or nr >= n or nc < 0 or nc >= n or f"{nr},{nc}" in obstacle_set:
+            break
+        r, c = nr, nc
+        path.append([r, c])
+        if f"{r},{c}" == goal_key:
+            break
+
+    return path
